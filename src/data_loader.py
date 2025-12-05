@@ -4,22 +4,23 @@ Data loading utilities for insurance risk analytics.
 This module provides functions to load and perform basic operations on insurance data.
 """
 
-import pandas as pd
 import os
 from pathlib import Path
+
+import pandas as pd
 
 
 def get_data_path(filename: str, data_type: str = "raw") -> Path:
     """
     Get the full path to a data file.
-    
+
     Parameters:
     -----------
     filename : str
         Name of the data file (e.g., 'insurance.csv')
     data_type : str
         Type of data directory: 'raw' or 'processed'
-        
+
     Returns:
     --------
     Path
@@ -30,27 +31,29 @@ def get_data_path(filename: str, data_type: str = "raw") -> Path:
     return data_path
 
 
-def load_insurance_data(filename: str = "insurance.csv", data_type: str = "raw") -> pd.DataFrame:
+def load_insurance_data(
+    filename: str = "insurance.csv", data_type: str = "raw"
+) -> pd.DataFrame:
     """
     Load insurance data from CSV file.
-    
+
     Parameters:
     -----------
     filename : str
         Name of the CSV file to load
     data_type : str
         Type of data directory: 'raw' or 'processed'
-        
+
     Returns:
     --------
     pd.DataFrame
         Loaded insurance data
     """
     file_path = get_data_path(filename, data_type)
-    
+
     if not file_path.exists():
         raise FileNotFoundError(f"Data file not found: {file_path}")
-    
+
     df = pd.read_csv(file_path)
     return df
 
@@ -58,12 +61,12 @@ def load_insurance_data(filename: str = "insurance.csv", data_type: str = "raw")
 def get_data_info(df: pd.DataFrame) -> dict:
     """
     Get basic information about the dataset.
-    
+
     Parameters:
     -----------
     df : pd.DataFrame
         Input dataframe
-        
+
     Returns:
     --------
     dict
@@ -84,12 +87,12 @@ def get_data_info(df: pd.DataFrame) -> dict:
 def validate_data(df: pd.DataFrame) -> dict:
     """
     Validate data quality and return validation results.
-    
+
     Parameters:
     -----------
     df : pd.DataFrame
         Input dataframe
-        
+
     Returns:
     --------
     dict
@@ -99,8 +102,9 @@ def validate_data(df: pd.DataFrame) -> dict:
         "has_missing": df.isnull().any().any(),
         "has_duplicates": df.duplicated().any(),
         "empty_dataframe": df.empty,
-        "numeric_columns": df.select_dtypes(include=['number']).columns.tolist(),
-        "categorical_columns": df.select_dtypes(include=['object', 'category']).columns.tolist(),
+        "numeric_columns": df.select_dtypes(include=["number"]).columns.tolist(),
+        "categorical_columns": df.select_dtypes(
+            include=["object", "category"]
+        ).columns.tolist(),
     }
     return validation
-
