@@ -4,9 +4,10 @@ Data loading utilities for insurance risk analytics.
 This module provides functions to load and perform basic operations on insurance data.
 """
 
-import pandas as pd
 import os
 from pathlib import Path
+
+import pandas as pd
 
 
 def get_data_path(filename: str, data_type: str = "raw") -> Path:

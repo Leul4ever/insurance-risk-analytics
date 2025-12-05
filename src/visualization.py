@@ -4,13 +4,13 @@ Visualization utilities for insurance risk analytics.
 This module provides functions for creating publication-quality plots.
 """
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
 
 # Set style
 sns.set_style("whitegrid")

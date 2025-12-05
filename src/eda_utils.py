@@ -4,10 +4,11 @@ Exploratory Data Analysis utilities.
 This module provides statistical analysis functions for EDA.
 """
 
-import pandas as pd
-import numpy as np
-from scipy import stats
 from typing import Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 
 def calculate_descriptive_stats(
