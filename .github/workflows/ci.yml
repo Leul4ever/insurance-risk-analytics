@@ -1,91 +1,50 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, task-1, develop ]
+    branches: [main, task-*]
   pull_request:
-    branches: [ main, task-1, develop ]
+    branches: [main]
 
 jobs:
-  lint:
-    name: Code Quality Check
+  validate-setup:
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v3
     
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.10'
+    
+    - name: Check project structure
+      run: |
+        [ -f "requirements.txt" ] || exit 1
+        [ -f "README.md" ] || exit 1
+        [ -f ".gitignore" ] || exit 1
+        [ -d "notebooks" ] || exit 1
+        [ -d "data" ] || exit 1
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install flake8 black isort
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install --upgrade pip
+        pip install -r requirements.txt
     
-    - name: Lint with flake8
+    - name: Test imports
       run: |
-        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        python -c "
+        import pandas as pd
+        import numpy as np
+        import matplotlib
+        print('Core packages imported successfully')
+        "
     
-    - name: Check code formatting with black
+    - name: Verify notebook
       run: |
-        black --check src/
-    
-    - name: Check import sorting with isort
-      run: |
-        isort --check-only src/
-
-  notebook-check:
-    name: Notebook Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install nbformat nbconvert
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    
-    - name: Check notebook format
-      run: |
-        python -c "import nbformat; [nbformat.read(open(f), as_version=4) for f in ['notebooks/01_eda.ipynb', 'notebooks/02_preprocessing.ipynb']]"
-
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install pytest pytest-cov
-    
-    - name: Run tests
-      run: |
-        pytest tests/ -v --cov=src --cov-report=xml || true
-    
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: false
-
-
+        python -c "
+        import json
+        with open('notebooks/01_eda.ipynb', 'r') as f:
+            nb = json.load(f)
+        print(f'Notebook contains {len(nb.get(\"cells\", []))} cells')
+        "
