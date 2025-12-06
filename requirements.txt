@@ -38,3 +38,6 @@ nbconvert>=7.7.0
 tqdm>=4.65.0  # Progress bars
 python-dotenv>=1.0.0  # Environment variables
 
+# Data Version Control
+dvc>=3.0.0
+
