@@ -67,10 +67,11 @@ insurance-risk-analytics/
 
 ### Task 3: A/B Hypothesis Testing ✅
 - [x] Test risk differences across provinces (regions)
-- [x] Test risk differences between zipcodes
-- [x] Test margin (profit) differences between zip codes
+- [x] Test risk differences between zipcodes (with enhanced dataset)
+- [x] Test margin (profit) differences between zip codes (with enhanced dataset)
 - [x] Test risk differences between Women and men
 - [x] Statistical test reports
+- [x] Enhanced dataset with zip codes, TotalPremium, and TotalClaims
 
 ### Task 4: Machine Learning & Predictive Modeling
 - [ ] Linear regression models per zipcode (predicting total claims)
