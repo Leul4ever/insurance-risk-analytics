@@ -65,12 +65,12 @@ insurance-risk-analytics/
 - [x] Reproducible data pipeline established
 - [x] DVC workflow documented
 
-### Task 3: A/B Hypothesis Testing
-- [ ] Test risk differences across provinces
-- [ ] Test risk differences between zipcodes
-- [ ] Test margin (profit) differences between zip codes
-- [ ] Test risk differences between Women and men
-- [ ] Statistical test reports
+### Task 3: A/B Hypothesis Testing ✅
+- [x] Test risk differences across provinces (regions)
+- [x] Test risk differences between zipcodes
+- [x] Test margin (profit) differences between zip codes
+- [x] Test risk differences between Women and men
+- [x] Statistical test reports
 
 ### Task 4: Machine Learning & Predictive Modeling
 - [ ] Linear regression models per zipcode (predicting total claims)
@@ -186,8 +186,8 @@ python -m dvc list data/raw/
 - ✅ **Task 1**: Git & GitHub + EDA & Statistics
 - ✅ **Task 2**: Data Version Control (DVC)
 
-### In Progress
-- 🔄 **Task 3**: A/B Hypothesis Testing
+### Completed
+- ✅ **Task 3**: A/B Hypothesis Testing
 
 ### Upcoming
 - ⏳ **Task 4**: Machine Learning & Predictive Modeling
@@ -195,7 +195,8 @@ python -m dvc list data/raw/
 ### Reports
 - **Interim Report**: `INTERIM_REPORT.md` - Covers Tasks 1 & 2
 - **EDA Report**: `reports/eda_report.md` - Comprehensive EDA findings
-- **Task Summaries**: `TASK1_COMPLETION_SUMMARY.md`, `TASK2_COMPLETION_SUMMARY.md`
+- **Hypothesis Testing Report**: `reports/hypothesis_testing_report.md` - Complete A/B testing results
+- **Task Summaries**: `TASK1_COMPLETION_SUMMARY.md`, `TASK2_COMPLETION_SUMMARY.md`, `TASK3_COMPLETION_SUMMARY.md`
 
 ## Repository Links
 

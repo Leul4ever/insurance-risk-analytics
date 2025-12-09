@@ -354,3 +354,169 @@ def format_test_results(result: Dict) -> str:
     output.append(f"{'='*60}\n")
 
     return "\n".join(output)
+
+
+def test_zipcode_risk_differences(
+    df: pd.DataFrame,
+    zipcode_column: str = "zipcode",
+    risk_metric_column: str = "TotalClaims",
+    alpha: float = 0.05,
+) -> Dict:
+    """
+    Test for risk differences across zip codes using Kruskal-Wallis test.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Input dataframe with zipcode and risk metric columns
+    zipcode_column : str
+        Column name for zip codes
+    risk_metric_column : str
+        Column name for risk metric (e.g., TotalClaims)
+    alpha : float
+        Significance level (default: 0.05)
+    
+    Returns:
+    --------
+    Dict
+        Dictionary containing test results
+    """
+    # Filter out zip codes with insufficient sample size (< 5 records)
+    zipcode_counts = df[zipcode_column].value_counts()
+    valid_zips = zipcode_counts[zipcode_counts >= 5].index
+    df_filtered = df[df[zipcode_column].isin(valid_zips)].copy()
+    
+    if len(valid_zips) < 2:
+        return {
+            "test": "Kruskal-Wallis Test",
+            "null_hypothesis": f"No difference in {risk_metric_column} across {zipcode_column} groups",
+            "status": "Cannot test - insufficient zip codes with adequate sample size",
+            "valid_zipcodes": len(valid_zips),
+            "p_value": None,
+            "reject_null": False,
+        }
+    
+    groups = [
+        group[risk_metric_column].values
+        for name, group in df_filtered.groupby(zipcode_column)
+    ]
+    
+    # Perform Kruskal-Wallis test
+    h_statistic, p_value = stats.kruskal(*groups)
+    
+    # Calculate group statistics
+    group_stats = (
+        df_filtered.groupby(zipcode_column)[risk_metric_column]
+        .agg(["count", "mean", "median", "std"])
+        .to_dict("index")
+    )
+    
+    result = {
+        "test": "Kruskal-Wallis Test",
+        "null_hypothesis": f"No difference in {risk_metric_column} across {zipcode_column} groups",
+        "h_statistic": h_statistic,
+        "p_value": p_value,
+        "alpha": alpha,
+        "reject_null": p_value < alpha,
+        "groups_stats": group_stats,
+        "valid_zipcodes": len(valid_zips),
+        "total_records": len(df_filtered),
+        "interpretation": (
+            f"Reject H₀: There ARE significant differences"
+            if p_value < alpha
+            else f"Fail to reject H₀: No significant differences"
+        ),
+    }
+    
+    return result
+
+
+def test_zipcode_margin_differences(
+    df: pd.DataFrame,
+    zipcode_column: str = "zipcode",
+    premium_column: str = "TotalPremium",
+    claims_column: str = "TotalClaims",
+    alpha: float = 0.05,
+) -> Dict:
+    """
+    Test for margin (profit) differences across zip codes.
+    Margin = TotalPremium - TotalClaims
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Input dataframe with zipcode, premium, and claims columns
+    zipcode_column : str
+        Column name for zip codes
+    premium_column : str
+        Column name for total premium
+    claims_column : str
+        Column name for total claims
+    alpha : float
+        Significance level (default: 0.05)
+    
+    Returns:
+    --------
+    Dict
+        Dictionary containing test results
+    """
+    # Calculate margin
+    df_test = df.copy()
+    df_test["Margin"] = df_test[premium_column] - df_test[claims_column]
+    
+    # Filter out zip codes with insufficient sample size (< 5 records)
+    zipcode_counts = df_test[zipcode_column].value_counts()
+    valid_zips = zipcode_counts[zipcode_counts >= 5].index
+    df_filtered = df_test[df_test[zipcode_column].isin(valid_zips)].copy()
+    
+    if len(valid_zips) < 2:
+        return {
+            "test": "Kruskal-Wallis Test",
+            "null_hypothesis": f"No difference in Margin across {zipcode_column} groups",
+            "status": "Cannot test - insufficient zip codes with adequate sample size",
+            "valid_zipcodes": len(valid_zips),
+            "p_value": None,
+            "reject_null": False,
+        }
+    
+    groups = [
+        group["Margin"].values
+        for name, group in df_filtered.groupby(zipcode_column)
+    ]
+    
+    # Perform Kruskal-Wallis test
+    h_statistic, p_value = stats.kruskal(*groups)
+    
+    # Calculate group statistics
+    group_stats = (
+        df_filtered.groupby(zipcode_column)["Margin"]
+        .agg(["count", "mean", "median", "std"])
+        .to_dict("index")
+    )
+    
+    # Calculate overall margin statistics
+    total_premium = df_filtered[premium_column].sum()
+    total_claims = df_filtered[claims_column].sum()
+    overall_margin = total_premium - total_claims
+    overall_margin_pct = (overall_margin / total_premium) * 100 if total_premium > 0 else 0
+    
+    result = {
+        "test": "Kruskal-Wallis Test",
+        "null_hypothesis": f"No difference in Margin across {zipcode_column} groups",
+        "h_statistic": h_statistic,
+        "p_value": p_value,
+        "alpha": alpha,
+        "reject_null": p_value < alpha,
+        "groups_stats": group_stats,
+        "valid_zipcodes": len(valid_zips),
+        "total_records": len(df_filtered),
+        "overall_margin": overall_margin,
+        "overall_margin_pct": overall_margin_pct,
+        "interpretation": (
+            f"Reject H₀: There ARE significant differences"
+            if p_value < alpha
+            else f"Fail to reject H₀: No significant differences"
+        ),
+    }
+    
+    return result
